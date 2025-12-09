@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent 管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f8f9fa;
+            padding: 0;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+            background: #f8f9fa;
+        }
+
+        .left-panel {
+            width: 35%;
+            min-width: 400px;
+            max-width: 500px;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            flex: 1;
+            background: white;
+            border-left: 1px solid #e8eaed;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            margin: 16px;
+            margin-left: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 32px);
+            flex-shrink: 0;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8eaed;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .collaboration-mode {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .mode-icon {
+            width: 24px;
+            height: 24px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            color: #4285f4;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .settings-btn:hover {
+            background: #f1f3f4;
+        }
+
+        .main-content {
+            padding: 24px;
+        }
+
+        .main-agent-notice {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            color: #1976d2;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notice-close {
+            background: none;
+            border: none;
+            color: #1976d2;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notice-close:hover {
+            opacity: 1;
+            background: rgba(25, 118, 210, 0.1);
+        }
+
+        .notice-icon {
+            width: 16px;
+            height: 16px;
+            background: #2196f3;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .agents-container {
+            min-height: 400px;
+        }
+
+        .agent-card {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .agent-card:hover {
+            border-color: #dadce0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .agent-card.dragging {
+            opacity: 0.6;
+            transform: rotate(2deg);
+            cursor: grabbing;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .agent-card.drag-over {
+            border-color: #4285f4;
+            background: #f8f9ff;
+        }
+
+        .agent-card.main-agent {
+            border-color: #e8eaed;
+            background: white;
+            position: relative;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .agent-details {
+            flex: 1;
+        }
+
+        .agent-details h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .agent-details p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .agent-menu {
+            position: relative;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+
+        .menu-button:hover {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            min-width: 140px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-item.primary {
+            color: #4285f4;
+        }
+
+        .dropdown-item.danger {
+            color: #ea4335;
+        }
+
+        .add-agent-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: white;
+            color: #4285f4;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-agent-btn:hover {
+            background: #f8f9ff;
+            border-color: #4285f4;
+            box-shadow: 0 2px 6px rgba(66, 133, 244, 0.15);
+        }
+
+        .add-agent-btn .plus-icon {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .config-sections {
+            margin-top: 32px;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .config-section {
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .config-section:last-child {
+            border-bottom: none;
+        }
+
+        .config-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            gap: 12px;
+        }
+
+        .config-header:hover {
+            background: #f8f9fa;
+        }
+
+        .config-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .config-title {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .config-arrow {
+            color: #666;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .config-section.expanded .config-arrow {
+            transform: rotate(180deg);
+        }
+
+        .config-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e8eaed;
+        }
+
+        .config-section.expanded .config-content {
+            display: block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.warning {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1976d2;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-placeholder {
+            height: 2px;
+            background: #4285f4;
+            border-radius: 1px;
+            margin: 6px 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .drag-placeholder.show {
+            opacity: 1;
+        }
+
+        .collapse-icon {
+            margin-left: 8px;
+            color: #666;
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .chat-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e8eaed;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .chat-title-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chat-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .chat-btn:hover {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 40px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #666;
+            background: #fafbfc;
+        }
+
+        .chat-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .chat-empty-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4285f4;
+            font-size: 24px;
+        }
+
+        .chat-empty-title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .chat-messages.has-messages {
+            justify-content: flex-start;
+            align-items: stretch;
+            text-align: left;
+            padding: 20px;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.bot {
+            background: #4285f4;
+            color: white;
+        }
+
+        .message-avatar.user {
+            background: #34a853;
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .message.user .message-content {
+            background: #4285f4;
+            border-color: #4285f4;
+            color: white;
+        }
+
+        .chat-input-area {
+            border-top: 1px solid #e8eaed;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 1px solid #e8eaed;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 14px;
+            resize: none;
+            min-height: 20px;
+            max-height: 120px;
+            font-family: inherit;
+            background: #f8f9fa;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #4285f4;
+            background: white;
+        }
+
+        .chat-input::placeholder {
+            color: #999;
+        }
+
+        .send-btn {
+            background: #4285f4;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            background: #3367d6;
+        }
+
+        .send-btn:disabled {
+            background: #dadce0;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 13px;
+            padding: 8px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+            }
+            30% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+            }
+            
+            .right-panel {
+                width: 100%;
+                height: 400px;
+                border-left: none;
+                border-top: 1px solid #e8eaed;
+                margin: 0;
+                border-radius: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .agent-card {
+                padding: 12px;
+            }
+
+            .agent-info {
+                gap: 8px;
+            }
+
+            .agent-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .right-panel {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧面板 - Agent管理 -->
+        <div class="left-panel">
+            <div class="header">
+                <div class="header-left">
+                    <div class="collaboration-mode">
+                        <div class="mode-icon">M</div>
+                        <span>Agent 协同方式：自由转交</span>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="settings-btn">转交关系设置</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="main-agent-notice">
+                    <div class="notice-content">
+                        <div class="notice-icon">!</div>
+                        <span>主 Agent 已更换，请重新检查转交关系设置</span>
+                    </div>
+                    <button class="notice-close" onclick="closeMainNotice()">×</button>
+                </div>
+                
+                <div class="agents-container" id="agentsContainer">
+                    <!-- Agent卡片将在这里动态生成 -->
+                </div>
+                
+                <button class="add-agent-btn" onclick="addNewAgent()">
+                    <span class="plus-icon">+</span>
+                    添加 Agent
+                </button>
+                
+                <!-- 配置选项区域 -->
+                <div class="config-sections">
+                    <div class="config-section">
+                        <div class="config-header" onclick="toggleConfigSection('welcome')">
+                            <div class="config-icon">💬</div>
+                            <span class="config-title">欢迎语</span>
+                            <span class="config-arrow">▼</span>
+                        </div>
+                        <div class="config-content" id="welcome-content">
+                            <!-- 欢迎语配置内容 -->
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-header" onclick="toggleConfigSection('conversation')">
+                            <div class="config-icon">👥</div>
+                            <span class="config-title">对话体验</span>
+                            <span class="config-arrow">▼</span>
+                        </div>
+                        <div class="config-content" id="conversation-content">
+                            <!-- 对话体验配置内容 -->
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-header" onclick="toggleConfigSection('variables')">
+                            <div class="config-icon">{x}</div>
+                            <span class="config-title">变量与记忆</span>
+                            <span class="config-arrow">▼</span>
+                        </div>
+                        <div class="config-content" id="variables-content">
+                            <!-- 变量与记忆配置内容 -->
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-header" onclick="toggleConfigSection('advanced')">
+                            <div class="config-icon">⚙️</div>
+                            <span class="config-title">高级设置</span>
+                            <span class="config-arrow">▼</span>
+                        </div>
+                        <div class="config-content" id="advanced-content">
+                            <!-- 高级设置配置内容 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 - 对话调试 -->
+        <div class="right-panel">
+            <div class="chat-header">
+                <div class="chat-title-area">
+                    <div class="chat-avatar">AI</div>
+                    <div class="chat-title">AI客服帮助您手动测试02</div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-btn" onclick="clearChat()">🗑️</button>
+                    <button class="chat-btn" onclick="startDebug()">✏️</button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-empty-state">
+                    <div class="chat-empty-icon">💬</div>
+                    <div class="chat-empty-title">AI客服帮助您手动测试02</div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="message-avatar bot">AI</div>
+                <div>
+                    <span>正在输入</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <div class="chat-input-container">
+                    <textarea 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="请输入您的问题..."
+                        rows="1"
+                        onkeydown="handleInputKeydown(event)"
+                        oninput="adjustTextareaHeight(this)"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知组件已移除 -->
+
+    <script src="script.js"></script>
+</body>
+</html>
