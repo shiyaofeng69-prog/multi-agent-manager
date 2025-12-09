@@ -195,6 +195,15 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
+        .agent-card.dragging .agent-expanded-content {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .agent-card.dragging .agent-header {
+            cursor: grabbing;
+        }
+
         .agent-card.drag-over {
             border-color: #4285f4;
             background: #f8f9ff;
@@ -312,6 +321,508 @@
 
         .dropdown-item.danger {
             color: #ea4335;
+        }
+
+        /* Agent展开功能样式 */
+        .agent-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .expand-btn:hover {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .main-badge {
+            background: #e8f0fe;
+            color: #1976d2;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .agent-expanded-content {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8eaed;
+        }
+
+        .agent-card.expanded .agent-expanded-content {
+            display: block;
+        }
+
+        .config-group {
+            margin-bottom: 20px;
+        }
+
+        .config-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .config-label .help-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #f1f3f4;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: help;
+        }
+
+        .model-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .model-select:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .description-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            font-size: 13px;
+            resize: none;
+            min-height: 60px;
+            font-family: inherit;
+        }
+
+        .description-input:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .description-input::placeholder {
+            color: #999;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .error-text {
+            color: #d93025;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .prompt-section {
+            margin-bottom: 16px;
+        }
+
+        .prompt-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .prompt-btn {
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-btn:hover {
+            background: #f1f3f4;
+        }
+
+        .prompt-btn.ai {
+            background: #e8f0fe;
+            border-color: #4285f4;
+            color: #1976d2;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+
+        .prompt-textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .prompt-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .plugin-section {
+            border-top: 1px solid #f1f3f4;
+            padding-top: 16px;
+        }
+
+        .plugin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .add-plugin-btn {
+            background: none;
+            border: none;
+            color: #4285f4;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .add-plugin-btn:hover {
+            background: #f8f9ff;
+        }
+
+        .plugin-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .plugin-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .plugin-info {
+            flex: 1;
+        }
+
+        .plugin-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .plugin-desc {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .plugin-menu {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .plugin-menu:hover {
+            background: #e8eaed;
+        }
+
+        /* 转交关系设置弹窗 */
+        .transfer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .transfer-modal.show {
+            display: flex;
+        }
+
+        .transfer-modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .transfer-modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transfer-modal-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .transfer-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .transfer-modal-close:hover {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .transfer-modal-body {
+            padding: 24px;
+        }
+
+        .transfer-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .transfer-column-title {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .transfer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .transfer-row:last-child {
+            border-bottom: none;
+        }
+
+        .transfer-from {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .transfer-agent-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .transfer-agent-id {
+            font-size: 12px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .transfer-arrow {
+            margin: 0 24px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .transfer-to {
+            flex: 1;
+        }
+
+        .transfer-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .transfer-select:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .transfer-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .transfer-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .transfer-dropdown.show {
+            display: block;
+        }
+
+        .transfer-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .transfer-option:hover {
+            background: #f8f9fa;
+        }
+
+        .transfer-option.selected {
+            background: #e8f0fe;
+            color: #1976d2;
+        }
+
+        .transfer-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #e8eaed;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        .transfer-option.selected .transfer-checkbox {
+            background: #4285f4;
+            border-color: #4285f4;
+        }
+
+        .transfer-modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #f1f3f4;
+        }
+
+        .transfer-btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .transfer-btn-cancel {
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .transfer-btn-cancel:hover {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .transfer-btn-confirm {
+            background: #4285f4;
+            color: white;
+        }
+
+        .transfer-btn-confirm:hover {
+            background: #3367d6;
         }
 
         .add-agent-btn {
@@ -796,7 +1307,7 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <button class="settings-btn">转交关系设置</button>
+                    <button class="settings-btn" onclick="openTransferSettings()">转交关系设置</button>
                 </div>
             </div>
             
@@ -877,6 +1388,7 @@
                 <div class="chat-actions">
                     <button class="chat-btn" onclick="clearChat()">🗑️</button>
                     <button class="chat-btn" onclick="startDebug()">✏️</button>
+                    <button class="chat-btn" onclick="testTaskPolling()">🔄</button>
                 </div>
             </div>
             
@@ -916,6 +1428,29 @@
     </div>
 
     <!-- 通知组件已移除 -->
+
+    <!-- 转交关系设置弹窗 -->
+    <div class="transfer-modal" id="transferModal">
+        <div class="transfer-modal-content">
+            <div class="transfer-modal-header">
+                <div class="transfer-modal-title">转交关系设置</div>
+                <button class="transfer-modal-close" onclick="closeTransferModal()">×</button>
+            </div>
+            <div class="transfer-modal-body">
+                <div class="transfer-header">
+                    <div class="transfer-column-title">转交方Agent</div>
+                    <div class="transfer-column-title">接收方Agent</div>
+                </div>
+                <div id="transferRelations">
+                    <!-- 转交关系将在这里动态生成 -->
+                </div>
+            </div>
+            <div class="transfer-modal-footer">
+                <button class="transfer-btn transfer-btn-cancel" onclick="closeTransferModal()">取消</button>
+                <button class="transfer-btn transfer-btn-confirm" onclick="saveTransferSettings()">确定</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
